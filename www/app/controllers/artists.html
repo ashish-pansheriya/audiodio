@@ -1,0 +1,16 @@
+
+<ion-scroll direction="y">
+  <ion-list>
+      <ion-item>
+          <button class="button button-full button-balanced" ng-click="browseSettingsModal.show()"><i class="icon ion-gear-a"></i></button>
+      </ion-item>
+    <ion-item ng-repeat="artist in artists | orderBy:browseComparator">
+        <button class="button button-full button-balanced" ng-click="setXipath(artist.xipath)">{{artist | artistTitle}}</button>
+    </ion-item>
+    <ion-item><!--SPACER--></ion-item>
+    <ion-item><!--SPACER--></ion-item>
+    <ion-item><!--SPACER--></ion-item>
+  </ion-list>
+
+</ion-scroll>
+

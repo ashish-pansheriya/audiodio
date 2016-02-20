@@ -1,0 +1,12 @@
+<!--song in playlist-->
+<div ng-click="showSong(model)" on-swipe-right="removeSong(model)" on-swipe-left="removeSong(model)">
+  <span>{{model | songNameFilter}}</span>
+  <audio ng-if="isSongInContext(model.xipath)" id="{{model.xipath}}" name="media" style="display: none;">
+    <source ng-if="isSongLoaded" type="audio/mpeg" src="{{uri | trusted}}">
+  </audio>
+  <div class="item range" ng-show="isSongInContext(model.xipath)">
+    <progress max="{{duration}}" value="{{currentTime.val}}"></progress>
+    <i ng-show="!isSongPlaying()" class="icon ion-play" ng-click="play()"></i>
+    <i ng-show="isSongPlaying()" class="icon ion-pause" ng-click="pause()"></i>
+  </div>
+</div>
