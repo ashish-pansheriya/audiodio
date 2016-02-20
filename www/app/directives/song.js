@@ -20,6 +20,11 @@ angular.module('songs', [])
       templateUrl: 'app/directives/songInfo.html'
     };
   }])
+  .filter('encodeReservedCharacters', function () {
+    return function (uri) {
+      return encodeURIComponent(uri);
+    };
+  })
   .filter('artistNameFilter', function () {
     return function (model) {
       return model.artist.substring(3, model.artist.length);
@@ -36,7 +41,7 @@ angular.module('songs', [])
       var vm = this;
 
       vm.song = {
-        "xipath":"",
+        "xipath": "",
         "bitrate":"",
         "duration":0,
         "name":"",
@@ -76,9 +81,9 @@ angular.module('songs', [])
       vm.isSongInContext = isSongInContext;
 
 
-
       //Load song into context
-      if (!vm.song.uri) {
+      vm.song = $scope.model; //passed into directive
+      if (!vm.song.uri ||vm.song.uri.length === 0) {
         links.formUrl('loadSong').then(function (url) {
           xipath.fetchSongByXipath(url, vm.song.xipath).then(function (song) {
             setTimeout(function () {
@@ -99,16 +104,15 @@ angular.module('songs', [])
 
       //FOOS
       function getArtistName () {
-        console.log($scope.model); //TESTING!!!
-        return $scope.model.artist;
+        return vm.song.artist;
       }
 
       function getAlbumName () {
-        return $scope.model.album;
+        return vm.song.album;
       }
 
       function getYear () {
-        return $scope.model.year;
+        return vm.song.year;
       }
       //playlist methods
       function showSong (s) {
@@ -130,7 +134,7 @@ angular.module('songs', [])
 
       function getCurrentTime () {
         var $audio = document.getElementById(xipath.getContext());
-        if ($scope.isSongInContext()) {
+        if (vm.isSongInContext()) {
           return $audio.currentTime;
         } else {
           return 0;
@@ -152,7 +156,7 @@ angular.module('songs', [])
         if ($audio) {
           $audio.load();
           $audio.play();
-          $audio.addEventListener('ended', $scope.next);
+          $audio.addEventListener('ended', vm.next);
         }
 
         $rootScope.$broadcast('radio:continue');
@@ -170,7 +174,7 @@ angular.module('songs', [])
       function play () {
         var $audio = document.getElementById(xipath.getContext());
         if ($audio && $audio.currentTime === 0) {
-          $scope.load();
+          vm.load();
         } else if ($audio) {
           $audio.play();
         }
@@ -188,7 +192,7 @@ angular.module('songs', [])
         $timeout(function () {
           xipath.setContext(nxt);
           $scope.$apply();
-          $scope.load();
+          vm.load();
         });
       }
 
