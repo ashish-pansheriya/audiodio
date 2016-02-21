@@ -14,6 +14,12 @@ angular.module('audiodio', ['ionic', 'frame', 'splash', 'resourceDirectory', 'br
         cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
         cordova.plugins.Keyboard.disableScroll(false);
         cordova.plugins.backgroundMode.enable(); //do not freeze on context switch for iphone
+        cordova.plugins.backgroundMode.onfailure = function(errorCode) {
+          console.log(errorCode); //TESTING!!!
+        };
+        cordova.plugins.backgroundMode.ondeactivate = function() {
+          console.log('deactivated');//TESTING!!!
+        };
         //cordova.plugins.backgroundMode.disable();
       }
       if (window.StatusBar) {
