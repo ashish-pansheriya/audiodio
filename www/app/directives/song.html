@@ -1,12 +1,17 @@
 <!--song in playlist-->
 <div ng-click="vm.showSong(vm.song)" on-swipe-right="vm.removeSong(vm.song)" on-swipe-left="vm.removeSong(vm.song)">
-  <span>{{vm.song | songNameFilter}}</span>
+
+    <div id="song-meta-box" >
+        <span style="display: block;">{{vm.song | songNameFilter}}</span>
+        <img ng-src="{{vm.artist.image}}" class="artist-avatar" style="display: inline;"/>
+        <p style="display: inline;">{{vm.getAlbumName()}}</p>
+    </div>
   <audio ng-if="vm.isSongInContext(vm.song.xipath)" id="{{vm.song.xipath}}" name="media" style="display: none;">
     <source ng-if="vm.isSongLoaded" type="audio/mpeg" src="{{vm.song.uri | trusted}}">
   </audio>
-  <div class="item range" ng-show="vm.isSongInContext(vm.song.xipath)">
+  <div class="item range" ng-show="vm.isSongInContext(vm.song.xipath)" ng-click="vm.togglePlayingState()">
     <progress max="{{vm.duration}}" value="{{vm.currentTime.val}}"></progress>
-    <i ng-show="!vm.isSongPlaying()" class="icon ion-play" ng-click="vm.play()"></i>
-    <i ng-show="vm.isSongPlaying()" class="icon ion-pause" ng-click="vm.pause()"></i>
+      <i ng-show="!vm.isSongPlaying()" class="icon ion-play md-font" ></i>
+      <i ng-show="vm.isSongPlaying()" class="icon ion-pause md-font" ></i>
   </div>
 </div>

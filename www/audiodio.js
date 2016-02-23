@@ -14,6 +14,12 @@ angular.module('audiodio', ['ionic', 'frame', 'splash', 'resourceDirectory', 'br
         cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
         cordova.plugins.Keyboard.disableScroll(false);
         cordova.plugins.backgroundMode.enable(); //do not freeze on context switch for iphone
+        cordova.plugins.backgroundMode.onfailure = function(errorCode) {
+          console.log(errorCode); //TESTING!!!
+        };
+        cordova.plugins.backgroundMode.ondeactivate = function() {
+          console.log('deactivated');//TESTING!!!
+        };
         //cordova.plugins.backgroundMode.disable();
       }
       if (window.StatusBar) {
@@ -244,8 +250,8 @@ angular.module('songs', [])
       return model.album.substring(3, model.album.length);
     };
   })
-  .controller('songCtrl', ['links', '$scope', '$stateParams', 'xipath', '$state', 'session', '$timeout', 'metrics', 'user', '$rootScope',
-    function (links, $scope , $stateParams, xipath, $state, session, $timeout, metrics, user, $rootScope) {
+  .controller('songCtrl', ['links', '$scope', '$stateParams', 'xipath', '$state', 'session', '$timeout', 'metrics', 'user', '$rootScope', 'artistCovers',
+    function (links, $scope , $stateParams, xipath, $state, session, $timeout, metrics, user, $rootScope, artistCovers) {
       //model get/set
       var vm = this;
 
@@ -286,9 +292,15 @@ angular.module('songs', [])
       vm.load = load;
       vm.play = play;
       vm.pause = pause;
+      vm.togglePlayingState = togglePlayingState;
       vm.next = next;
       vm.isSongInContext = isSongInContext;
+      vm.volume = 50.0;
 
+      vm.artist = {
+        image: "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
+        xipath: ""
+      };
 
       //Load song into context
       vm.song = $scope.model; //passed into directive
@@ -310,6 +322,12 @@ angular.module('songs', [])
         vm.isSongLoaded = true;
       }
 
+      //load artist meta data
+      links.formUrl('artistMetaData').then(function (url) {
+        artistCovers.fetchArtistMetaData(url, vm.song.xipath.substring(0,6)).then(function (artist) {
+          vm.artist = artist;
+        });
+      });
 
       //FOOS
       function getArtistName () {
@@ -382,6 +400,7 @@ angular.module('songs', [])
       }
       function play () {
         var $audio = document.getElementById(xipath.getContext());
+        $audio.volume = vm.volume / 100.0;
         if ($audio && $audio.currentTime === 0) {
           vm.load();
         } else if ($audio) {
@@ -392,6 +411,13 @@ angular.module('songs', [])
         var $audio = document.getElementById(xipath.getContext());
         if ($audio) {
           $audio.pause();
+        }
+      }
+      function togglePlayingState () {
+        if (vm.isSongPlaying()) {
+          vm.pause();
+        } else {
+          vm.play();
         }
       }
       function next () {
@@ -754,7 +780,31 @@ angular.module('browse', [])
 
 
 angular.module('meta-data', [])
-.factory('albumCovers', ['$q', '$http', function ($q, $http) {
+  .factory('artistCovers', ['$q', '$http', function ($q, $http) {
+    var service = {};
+    service.artists = {}; //album cache
+
+    service.fetchArtistMetaData = function (link, xipath) {
+      var cb = $q.defer();
+      link += '/' + xipath;
+
+      if (service.artists[xipath]) {
+        cb.resolve(service.artists[xipath]);
+      } else {
+        $http.get(link).then(function (res) {
+            service.artists[xipath] = res.data;
+            cb.resolve(service.artists[xipath]);
+          },
+          function (err) {
+            cb.resolve({});
+          });
+      }
+
+      return cb.promise;
+    };
+    return service;
+  }])
+  .factory('albumCovers', ['$q', '$http', function ($q, $http) {
     var service = {};
     service.albums = {}; //album cache
 
@@ -777,7 +827,7 @@ angular.module('meta-data', [])
       return cb.promise;
     };
     return service;
-}]);
+  }]);
 var session = {
   maxSessionSize : 50
 };

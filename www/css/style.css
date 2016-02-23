@@ -5,3 +5,24 @@
 .text-right {
   text-align: right;
 }
+
+
+/* song directive */
+i.md-font {
+    font-size: 40px !important;
+    margin-left: 5px;
+}
+i.lg-font {
+    font-size: 60px !important;
+    margin-left: 5px;
+}
+img.artist-avatar {
+    max-width: 125px;
+    max-height: 75px;
+}
+/* playlist menu override */
+.menu.menu-left {
+    width: 60% !important; }
+
+.menu-open .menu-content {
+    transform: translate3d(60%, 0px, 0px) !important; }

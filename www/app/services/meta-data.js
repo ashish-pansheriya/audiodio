@@ -1,5 +1,29 @@
 angular.module('meta-data', [])
-.factory('albumCovers', ['$q', '$http', function ($q, $http) {
+  .factory('artistCovers', ['$q', '$http', function ($q, $http) {
+    var service = {};
+    service.artists = {}; //album cache
+
+    service.fetchArtistMetaData = function (link, xipath) {
+      var cb = $q.defer();
+      link += '/' + xipath;
+
+      if (service.artists[xipath]) {
+        cb.resolve(service.artists[xipath]);
+      } else {
+        $http.get(link).then(function (res) {
+            service.artists[xipath] = res.data;
+            cb.resolve(service.artists[xipath]);
+          },
+          function (err) {
+            cb.resolve({});
+          });
+      }
+
+      return cb.promise;
+    };
+    return service;
+  }])
+  .factory('albumCovers', ['$q', '$http', function ($q, $http) {
     var service = {};
     service.albums = {}; //album cache
 
@@ -22,4 +46,4 @@ angular.module('meta-data', [])
       return cb.promise;
     };
     return service;
-}]);
+  }]);
