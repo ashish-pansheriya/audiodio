@@ -1,3 +1,10 @@
-<button class="button button-full button-calm text-left"><i class="icon ion-android-add-circle"></i>{{vm.song | songNameFilter}}</button>
-<p>Artist: {{vm.song | artistNameFilter}}</p>
-<p>Album: {{vm.song | albumTitleFilter}}</p>
+<div class="row">
+    <div class="col-25">
+        <img class="album-cover-preview" ng-src="{{vm.album.image}}"/>
+    </div>
+    <div class="col-75">
+        <button class="button button-calm text-left"><i class="icon ion-android-add-circle"></i>{{vm.song | songNameFilter}}</button>
+        <p>{{vm.album.year}}</p>
+        <p>{{vm.song | artistNameFilter}}</p>
+    </div>
+</div>

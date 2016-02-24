@@ -35,8 +35,8 @@ angular.module('songs', [])
       return model.album.substring(3, model.album.length);
     };
   })
-  .controller('songCtrl', ['links', '$scope', '$stateParams', 'xipath', '$state', 'session', '$timeout', 'metrics', 'user', '$rootScope', 'artistCovers',
-    function (links, $scope , $stateParams, xipath, $state, session, $timeout, metrics, user, $rootScope, artistCovers) {
+  .controller('songCtrl', ['links', '$scope', '$stateParams', 'xipath', '$state', 'session', '$timeout', 'metrics', 'user', '$rootScope', 'artistCovers', 'albumCovers',
+    function (links, $scope , $stateParams, xipath, $state, session, $timeout, metrics, user, $rootScope, artistCovers, albumCovers) {
       //model get/set
       var vm = this;
 
@@ -81,14 +81,19 @@ angular.module('songs', [])
       vm.next = next;
       vm.isSongInContext = isSongInContext;
       vm.volume = 50.0;
-
+      vm.album = {
+        xipath: '',
+        year: '',
+        title: '',
+        image: "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+      };
       vm.artist = {
         image: "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
         xipath: ""
       };
 
       //Load song into context
-      vm.song = $scope.model; //passed into directive
+      vm.song = angular.extend(vm.song, $scope.model); //passed into directive
       if (!vm.song.uri ||vm.song.uri.length === 0) {
         links.formUrl('loadSong').then(function (url) {
           xipath.fetchSongByXipath(url, vm.song.xipath).then(function (song) {
@@ -111,6 +116,13 @@ angular.module('songs', [])
       links.formUrl('artistMetaData').then(function (url) {
         artistCovers.fetchArtistMetaData(url, vm.song.xipath.substring(0,6)).then(function (artist) {
           vm.artist = artist;
+        });
+      });
+
+      //load album meta data
+      links.formUrl('albumMetaData').then(function (url) {
+        albumCovers.fetchAlbumMetaData(url, vm.song.xipath.substring(0,9)).then(function (album) {
+          vm.album = album;
         });
       });
 

@@ -25,4 +25,11 @@ img.artist-avatar {
     width: 60% !important; }
 
 .menu-open .menu-content {
-    transform: translate3d(60%, 0px, 0px) !important; }
+    transform: translate3d(60%, 0px, 0px) !important;
+}
+
+/* song info directive */
+img.album-cover-preview {
+    width: 200px;
+    max-height: 200px;
+}
