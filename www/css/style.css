@@ -34,3 +34,26 @@ img.album-cover-preview {
     max-height: 100px;
 }
 
+
+/* FAB */
+
+button.fab-top-right {
+    z-index: 999;
+
+    position: absolute;
+    top: 10px;
+    right: 20px;
+}
+
+button.fab-btm-right {
+    z-index: 999;
+    position: absolute;
+    bottom: 100px;
+    right: 20px;
+}
+
+div.fab-scroll {
+    position: relative;
+    overflow-y: scroll;
+    height: 100%;
+}

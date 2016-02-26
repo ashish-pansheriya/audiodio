@@ -4,7 +4,23 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('audiodio', ['ionic', 'frame', 'splash', 'resourceDirectory', 'browse', 'playlist', 'songs', 'account', 'search', 'history', 'radioStuff', 'radioServices', 'album.covers', 'meta-data'])
+angular.module('audiodio', [
+  'ionic',
+  'frame',
+  'splash',
+  'resourceDirectory',
+  'browse',
+  'playlist',
+  'songs',
+  'account',
+  'search',
+  'history',
+  'radioStuff',
+  'radioServices',
+  'album.covers',
+  'meta-data',
+  'audiodio.search.artists'
+])
 
   .run(function($ionicPlatform) {
     $ionicPlatform.ready(function () {
@@ -78,7 +94,7 @@ angular.module('audiodio', ['ionic', 'frame', 'splash', 'resourceDirectory', 'br
         views: {
           'mainContent': {
             templateUrl: 'app/controllers/artists.html',
-            controller: 'artistsCtrl'
+            controller: 'ArtistsCtrl as vm'
           }
         }
       })

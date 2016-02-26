@@ -4,7 +4,23 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('audiodio', ['ionic', 'frame', 'splash', 'resourceDirectory', 'browse', 'playlist', 'songs', 'account', 'search', 'history', 'radioStuff', 'radioServices', 'album.covers', 'meta-data'])
+angular.module('audiodio', [
+  'ionic',
+  'frame',
+  'splash',
+  'resourceDirectory',
+  'browse',
+  'playlist',
+  'songs',
+  'account',
+  'search',
+  'history',
+  'radioStuff',
+  'radioServices',
+  'album.covers',
+  'meta-data',
+  'audiodio.search.artists'
+])
 
   .run(function($ionicPlatform) {
     $ionicPlatform.ready(function () {
@@ -78,7 +94,7 @@ angular.module('audiodio', ['ionic', 'frame', 'splash', 'resourceDirectory', 'br
         views: {
           'mainContent': {
             templateUrl: 'app/controllers/artists.html',
-            controller: 'artistsCtrl'
+            controller: 'ArtistsCtrl as vm'
           }
         }
       })
@@ -250,8 +266,8 @@ angular.module('songs', [])
       return model.album.substring(3, model.album.length);
     };
   })
-  .controller('songCtrl', ['links', '$scope', '$stateParams', 'xipath', '$state', 'session', '$timeout', 'metrics', 'user', '$rootScope', 'artistCovers',
-    function (links, $scope , $stateParams, xipath, $state, session, $timeout, metrics, user, $rootScope, artistCovers) {
+  .controller('songCtrl', ['links', '$scope', '$stateParams', 'xipath', '$state', 'session', '$timeout', 'metrics', 'user', '$rootScope', 'artistCovers', 'albumCovers',
+    function (links, $scope , $stateParams, xipath, $state, session, $timeout, metrics, user, $rootScope, artistCovers, albumCovers) {
       //model get/set
       var vm = this;
 
@@ -296,14 +312,19 @@ angular.module('songs', [])
       vm.next = next;
       vm.isSongInContext = isSongInContext;
       vm.volume = 50.0;
-
+      vm.album = {
+        xipath: '',
+        year: '',
+        title: '',
+        image: "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+      };
       vm.artist = {
         image: "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
         xipath: ""
       };
 
       //Load song into context
-      vm.song = $scope.model; //passed into directive
+      vm.song = angular.extend(vm.song, $scope.model); //passed into directive
       if (!vm.song.uri ||vm.song.uri.length === 0) {
         links.formUrl('loadSong').then(function (url) {
           xipath.fetchSongByXipath(url, vm.song.xipath).then(function (song) {
@@ -326,6 +347,13 @@ angular.module('songs', [])
       links.formUrl('artistMetaData').then(function (url) {
         artistCovers.fetchArtistMetaData(url, vm.song.xipath.substring(0,6)).then(function (artist) {
           vm.artist = artist;
+        });
+      });
+
+      //load album meta data
+      links.formUrl('albumMetaData').then(function (url) {
+        albumCovers.fetchAlbumMetaData(url, vm.song.xipath.substring(0,9)).then(function (album) {
+          vm.album = album;
         });
       });
 
@@ -437,6 +465,60 @@ angular.module('songs', [])
 
     }]);
 
+angular.module('audiodio.search.artists', [])
+
+  .controller('ArtistsCtrl', ArtistsCtrl);
+
+ArtistsCtrl.$inject = ['links', '$scope', 'browseArtist', 'directory', '$state', '$ionicModal', '$filter', 'user', '$timeout'];
+
+function ArtistsCtrl (links, $scope, browseArtist, directory, $state, $ionicModal, $filter, user, $timeout) {
+  var vm = this;
+  vm.artists = [];
+  vm.setXipath = setXipath;
+  vm.doRefresh = fetchArtists;
+  vm.toggleSort = toggleComparator;
+  vm.isSortByHeat = true;
+
+  vm.sortPopup = null;
+  vm.comparators = {
+    sortByHeat : function (model) {
+      return -1 * model.heat;
+    },
+    sortByName : function (model) {
+      return $filter('artistTitle')(model);
+    }
+  };
+
+  function toggleComparator() {
+    vm.isSortByHeat = !vm.isSortByHeat;
+    if (vm.isSortByHeat) {
+      vm.browseComparator =  vm.comparators.sortByHeat;
+    } else {
+      vm.browseComparator =  vm.comparators.sortByName;
+    }
+
+    //force re render
+    $timeout(function () {
+      $scope.$apply();
+    });
+  }
+
+  function setXipath (xi) {
+    directory.setContext(xi);
+    $state.go('app.albums', {reload: true});
+  }
+
+  function fetchArtists() {
+    links.formUrl('searchByArtist').then(function (url) {
+      browseArtist.getAll(url, user.getId(), '').then(function (artists) {
+        vm.artists = artists;
+        $scope.$broadcast('scroll.refreshComplete');
+      });
+    });
+  }
+
+  fetchArtists();
+}
 angular.module('frame', [])
   .controller('frameCtrl', ['$rootScope', '$scope', '$ionicModal', 'session', 'xipath', 'links', 'user', '$ionicHistory', '$location', '$state', 'radioService',  function ($rootScope, $scope, $ionicModal, session, xipath, links, user, $ionicHistory, $location, $state, radioService) {
 
@@ -550,55 +632,6 @@ angular.module('radioStuff', [])
     });
   }]);
 angular.module('search', [])
-  .controller('artistsCtrl', ['links', '$scope', 'browseArtist', 'directory', '$state', '$ionicModal', '$filter', 'user', '$timeout', function (links, $scope, browseArtist, directory, $state, $ionicModal, $filter, user, $timeout) {
-    $ionicModal.fromTemplateUrl('app/controllers/browseSettingsModal.html', {
-      scope: $scope,
-      animation: 'slide-in-up',
-      controller: 'browseSettingsCtrl'
-    }).then(function(modal) {
-      $scope.browseSettingsModal = modal;
-    });
-    $scope.comparators = {
-      sortByHeat : function (model) {
-        return -1 * model.heat;
-      },
-      sortByName : function (model) {
-        return $filter('artistTitle')(model);
-      }
-    };
-
-    $scope.sortOptions = [
-      { text: "Heat Value", value: 'sortByHeat' },
-      { text: "Artist Name", value: 'sortByName' }
-    ];
-    $scope.default = {
-      val: 'sortByHeat'
-    };
-    $scope.changeSort = function (val) {
-      $scope.browseComparator =  $scope.comparators[val];
-      $timeout(function () {
-        $scope.$apply();
-      });
-
-    };
-
-    $scope.browseComparator =  $scope.sortByHeat;
-
-    $scope.setXipath = function (xi) {
-      directory.setContext(xi);
-      $state.go('app.albums', {reload: true});
-    };
-    $scope.artists = [];
-    function fetchArtists() {
-      links.formUrl('searchByArtist').then(function (url) {
-        browseArtist.getAll(url, user.getId(), '').then(function (artists) {
-          $scope.artists = artists;
-        });
-      });
-    }
-
-    fetchArtists();
-  }])
   .controller('albumsCtrl', ['links', '$scope', 'browseAlbum', '$stateParams', 'directory', '$state', function (links, $scope, browseAlbum , $stateParams, directory, $state) {
 
     $scope.xipath    = directory.getContext();
