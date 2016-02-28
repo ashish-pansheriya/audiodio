@@ -89,12 +89,11 @@ angular.module('audiodio', [
         views: {
           'mainContent': {
             templateUrl: 'app/controllers/splash.html',
-            controller: 'splashCtrl'
+            controller: 'splashCtrl as vm'
           }
         }
       })
       .state('app.artists', {
-
         url: '/artists',
         views: {
           'mainContent': {
@@ -104,7 +103,6 @@ angular.module('audiodio', [
         }
       })
       .state('app.albums', {
-
         url: '/albums',
         views: {
           'mainContent': {
@@ -266,13 +264,13 @@ angular.module('songs', [])
       return model.artist.substring(3, model.artist.length);
     };
   })
-  .filter('albumTitleFilter', function () {
+  .filter('albumNameFilter', function () {
     return function (model) {
       return model.album.substring(3, model.album.length);
     };
   })
-  .controller('songCtrl', ['links', '$scope', '$stateParams', 'xipath', '$state', 'session', '$timeout', 'metrics', 'user', '$rootScope', 'artistCovers', 'albumCovers',
-    function (links, $scope , $stateParams, xipath, $state, session, $timeout, metrics, user, $rootScope, artistCovers, albumCovers) {
+  .controller('songCtrl', ['links', '$scope', '$stateParams', 'xipath', '$state', 'session', '$timeout', 'metrics', 'user', '$rootScope', 'albumCovers',
+    function (links, $scope , $stateParams, xipath, $state, session, $timeout, metrics, user, $rootScope, albumCovers) {
       //model get/set
       var vm = this;
 
@@ -287,8 +285,8 @@ angular.module('songs', [])
         "year":"",
         "uri":""
       };
-      vm.getArtistName = getArtistName;
-      vm.getAlbumName = getAlbumName;
+      vm.getArtistName = getArtistName; //deprecated
+      vm.getAlbumName = getAlbumName; //deprecated
       vm.getYear = getYear;
       vm.showSong = showSong;
       vm.removeSong = removeSong;
@@ -323,10 +321,6 @@ angular.module('songs', [])
         title: '',
         image: "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
       };
-      vm.artist = {
-        image: "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
-        xipath: ""
-      };
 
       //Load song into context
       vm.song = angular.extend(vm.song, $scope.model); //passed into directive
@@ -340,20 +334,11 @@ angular.module('songs', [])
                 vm.isSongLoaded = true;
               });
             }, 1);
-
-
           });
         });
       } else {
         vm.isSongLoaded = true;
       }
-
-      //load artist meta data
-      links.formUrl('artistMetaData').then(function (url) {
-        artistCovers.fetchArtistMetaData(url, vm.song.xipath.substring(0,6)).then(function (artist) {
-          vm.artist = artist;
-        });
-      });
 
       //load album meta data
       links.formUrl('albumMetaData').then(function (url) {
@@ -472,7 +457,7 @@ angular.module('songs', [])
 
 angular.module('audiodio.search.artists', [])
 
-  .controller('ArtistsCtrl', ArtistsCtrl);
+.controller('ArtistsCtrl', ArtistsCtrl);
 
 ArtistsCtrl.$inject = ['links', '$scope', 'browseArtist', 'directory', '$state', '$ionicModal', '$filter', 'user', '$timeout'];
 
@@ -725,11 +710,18 @@ angular.module('search', [])
 
 
 
-angular.module('splash', [])
-  .controller('splashCtrl', function () {
+angular.module('splash', [
+  'account'
+])
 
-  });
+.controller('splashCtrl', SplashCtrl);
 
+SplashCtrl.$inject = ['$scope', 'user'];
+
+function SplashCtrl ($scope, user) {
+  var vm = this;
+  vm.username = user.getId();
+}
 /*var user = {
   id: 'will',
   token: null

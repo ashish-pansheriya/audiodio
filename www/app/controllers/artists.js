@@ -1,6 +1,6 @@
 angular.module('audiodio.search.artists', [])
 
-  .controller('ArtistsCtrl', ArtistsCtrl);
+.controller('ArtistsCtrl', ArtistsCtrl);
 
 ArtistsCtrl.$inject = ['links', '$scope', 'browseArtist', 'directory', '$state', '$ionicModal', '$filter', 'user', '$timeout'];
 

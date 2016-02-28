@@ -84,12 +84,11 @@ angular.module('audiodio', [
         views: {
           'mainContent': {
             templateUrl: 'app/controllers/splash.html',
-            controller: 'splashCtrl'
+            controller: 'splashCtrl as vm'
           }
         }
       })
       .state('app.artists', {
-
         url: '/artists',
         views: {
           'mainContent': {
@@ -99,7 +98,6 @@ angular.module('audiodio', [
         }
       })
       .state('app.albums', {
-
         url: '/albums',
         views: {
           'mainContent': {
