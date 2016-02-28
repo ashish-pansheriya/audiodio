@@ -8,11 +8,27 @@ var rename = require('gulp-rename');
 var sh = require('shelljs');
 var flatten = require('gulp-flatten');
 
+var config = require('./config');
+var argv = require('yargs').argv;
+var ngConstant = require('gulp-ng-constant');
+var merge = require('merge-stream');
+
 var paths = {
   sass: ['./scss/**/*.scss']
 };
-gulp.task('build', function (done) {
-  return gulp.src('./www/app/**/*.js').pipe(concat('audiodio.js')).pipe(gulp.dest('./www/'));
+gulp.task('build', function () {
+  var user = argv.user || 'will'; //default
+
+  var constantsStream = ngConstant({
+    name: 'audiodio.constants',
+    constants: config.usernames[user],
+    stream: true
+  });
+  var appStream = gulp.src('./www/app/**/*.js');
+
+  return merge(appStream, constantsStream)
+    .pipe(concat('audiodio.js'))
+    .pipe(gulp.dest('./www/'));
 });
 gulp.task('default', ['sass', 'build']);
 

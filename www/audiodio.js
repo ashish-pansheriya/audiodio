@@ -1,3 +1,8 @@
+angular.module("audiodio.constants", [])
+
+.constant("USER", "will")
+
+;
 // Ionic Starter App
 
 // angular.module is a global place for creating, registering and retrieving Angular modules
@@ -725,17 +730,18 @@ angular.module('splash', [])
 
   });
 
-var user = {
+/*var user = {
   id: 'will',
   token: null
-};
-
-angular.module('account', [])
-.factory('user', ['$http', '$q', function ($http, $q) {
+};*/
+angular.module('account', [
+  'audiodio.constants'
+])
+.factory('user', ['$http', '$q', 'USER', function ($http, $q, USER) {
     var profile = {};
 
     profile.getId = function () {
-      return user.id;
+      return USER;
     };
 
     profile.login     = function () {
