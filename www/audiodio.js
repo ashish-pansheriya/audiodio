@@ -24,7 +24,8 @@ angular.module('audiodio', [
   'radioServices',
   'album.covers',
   'meta-data',
-  'audiodio.search.artists'
+  'audiodio.search.artists',
+  'angular-inview'
 ])
 
   .run(function($ionicPlatform) {
@@ -233,12 +234,13 @@ angular.module('album.covers', [])
     }]);
 
 <!--song in playlist-->
-angular.module('songs', [])
+angular.module('songs', ['angular-inview'])
   .directive('song', [function () { /* side menu */
     return {
       restrict: 'EA',
       scope: {
-        model: '='
+        model: '=',
+        position: '='
       },
       controller: 'songCtrl as vm',
       templateUrl: 'app/directives/song.html'
@@ -248,7 +250,8 @@ angular.module('songs', [])
     return {
       restrict: 'EA',
       scope: {
-        model: '='
+        model: '=',
+        position: '='
       },
       controller: 'songCtrl as vm',
       templateUrl: 'app/directives/songInfo.html'
@@ -273,7 +276,7 @@ angular.module('songs', [])
     function (links, $scope , $stateParams, xipath, $state, session, $timeout, metrics, user, $rootScope, albumCovers) {
       //model get/set
       var vm = this;
-
+      var loadIndexLimit = 5; //load the first few songs in either albums or playlist
       vm.song = {
         "xipath": "",
         "bitrate":"",
@@ -321,32 +324,39 @@ angular.module('songs', [])
         title: '',
         image: "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
       };
+      vm.showMetaData = showMetaData;
 
-      //Load song into context
       vm.song = angular.extend(vm.song, $scope.model); //passed into directive
-      if (!vm.song.uri ||vm.song.uri.length === 0) {
-        links.formUrl('loadSong').then(function (url) {
-          xipath.fetchSongByXipath(url, vm.song.xipath).then(function (song) {
-            setTimeout(function () {
-              $scope.$apply(function () {
-                vm.song = song;
 
-                vm.isSongLoaded = true;
-              });
-            }, 1);
+      showMetaData(false, $scope.position);
+
+      function showMetaData(visible, index) {
+        if (visible || index < loadIndexLimit) {
+          //load album meta data
+          links.formUrl('albumMetaData').then(function (url) {
+            albumCovers.fetchAlbumMetaData(url, vm.song.xipath.substring(0,9)).then(function (album) {
+              vm.album = album;
+            });
           });
-        });
-      } else {
-        vm.isSongLoaded = true;
-      }
 
-      //load album meta data
-      links.formUrl('albumMetaData').then(function (url) {
-        albumCovers.fetchAlbumMetaData(url, vm.song.xipath.substring(0,9)).then(function (album) {
-          vm.album = album;
-        });
-      });
+          //Load song into context
+          if (!vm.song.uri ||vm.song.uri.length === 0) {
+            links.formUrl('loadSong').then(function (url) {
+              xipath.fetchSongByXipath(url, vm.song.xipath).then(function (song) {
+                setTimeout(function () {
+                  $scope.$apply(function () {
+                    vm.song = song;
 
+                    vm.isSongLoaded = true;
+                  });
+                }, 1);
+              });
+            });
+          } else {
+            vm.isSongLoaded = true;
+          }
+        }
+      };
       //FOOS
       function getArtistName () {
         return vm.song.artist;
@@ -836,10 +846,31 @@ angular.module('meta-data', [])
     return service;
   }])
   .factory('albumCovers', ['$q', '$http', function ($q, $http) {
-    var service = {};
-    service.albums = {}; //album cache
+    var service = {
+      albums: {},
+      fetchAlbumMetaData: fetchAlbumMetaData,
+      getDefault: fetchDefaultAlbumMetaData
+    };
 
-    service.fetchAlbumMetaData = function (link, xipath) {
+    function fetchDefaultAlbumMetaData (link) {
+      var cb = $q.defer();
+      link += '/' + 'null';
+
+      if (service.albums[xipath]) {
+        cb.resolve(service.albums['null']);
+      } else {
+        $http.get(link).then(function (res) {
+            service.albums['null'] = res.data;
+            cb.resolve(service.albums['null']);
+          },
+          function (err) {
+            cb.resolve({});
+          });
+      }
+
+      return cb.promise;
+    }
+    function fetchAlbumMetaData (link, xipath) {
       var cb = $q.defer();
       link += '/' + xipath;
 
@@ -856,7 +887,7 @@ angular.module('meta-data', [])
       }
 
       return cb.promise;
-    };
+    }
     return service;
   }]);
 var session = {

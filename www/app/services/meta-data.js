@@ -24,10 +24,31 @@ angular.module('meta-data', [])
     return service;
   }])
   .factory('albumCovers', ['$q', '$http', function ($q, $http) {
-    var service = {};
-    service.albums = {}; //album cache
+    var service = {
+      albums: {},
+      fetchAlbumMetaData: fetchAlbumMetaData,
+      getDefault: fetchDefaultAlbumMetaData
+    };
 
-    service.fetchAlbumMetaData = function (link, xipath) {
+    function fetchDefaultAlbumMetaData (link) {
+      var cb = $q.defer();
+      link += '/' + 'null';
+
+      if (service.albums[xipath]) {
+        cb.resolve(service.albums['null']);
+      } else {
+        $http.get(link).then(function (res) {
+            service.albums['null'] = res.data;
+            cb.resolve(service.albums['null']);
+          },
+          function (err) {
+            cb.resolve({});
+          });
+      }
+
+      return cb.promise;
+    }
+    function fetchAlbumMetaData (link, xipath) {
       var cb = $q.defer();
       link += '/' + xipath;
 
@@ -44,6 +65,6 @@ angular.module('meta-data', [])
       }
 
       return cb.promise;
-    };
+    }
     return service;
   }]);

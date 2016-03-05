@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
-      <meta http-equiv="Content-Security-Policy" content="default-src 'self' http://192.168.2.203:8080/resources/ ws://localhost:35729 data: gap: https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *;script-src 'self' localhost:35729 'unsafe-eval' 'unsafe-inline';">
+    <meta name="viewport" content="initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,width=device-width,user-scalable=0">
+<!--    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">-->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' http://192.168.2.203:8080/resources/ ws://localhost:35729 data: gap: https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *;script-src 'self' localhost:35729 'unsafe-eval' 'unsafe-inline';">
     <title></title>
 
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
@@ -15,17 +16,18 @@
 
     <!-- ionic/angularjs js -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
-<!--
-    -->
+    <script src="lib/angular-inview/angular-inview.js"></script>
+    <!--
+        -->
     <!-- cordova script (this will be a 404 during development) -->
     <script src="cordova.js"></script>
 
     <!-- your app's js -->
     <script src="audiodio.js"></script>
 
-  </head>
+</head>
 
-  <body ng-app="audiodio">
-    <ion-nav-view></ion-nav-view>
-  </body>
+<body ng-app="audiodio">
+<ion-nav-view  in-view-container></ion-nav-view>
+</body>
 </html>

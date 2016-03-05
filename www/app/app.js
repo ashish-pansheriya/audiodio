@@ -19,7 +19,8 @@ angular.module('audiodio', [
   'radioServices',
   'album.covers',
   'meta-data',
-  'audiodio.search.artists'
+  'audiodio.search.artists',
+  'angular-inview'
 ])
 
   .run(function($ionicPlatform) {

@@ -3,7 +3,7 @@
     <div class="song-meta-box" >
         <span style="display: block;">{{vm.song | songNameFilter}}</span>
         <p style="display: inline;">{{vm.song | artistNameFilter}}</p>
-        <p>{{vm.song | albumNameFilter}}</p>
+<!--        <p>{{vm.song | albumNameFilter}}</p>-->
     </div>
   <audio ng-if="vm.isSongInContext(vm.song.xipath)" id="{{vm.song.xipath}}" name="media" style="display: none;">
     <source ng-if="vm.isSongLoaded" type="audio/mpeg" src="{{vm.song.uri | trusted}}">
