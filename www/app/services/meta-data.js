@@ -12,6 +12,7 @@ angular.module('meta-data', [])
       } else {
         $http.get(link).then(function (res) {
             service.artists[xipath] = res.data;
+
             cb.resolve(service.artists[xipath]);
           },
           function (err) {
@@ -34,7 +35,7 @@ angular.module('meta-data', [])
       var cb = $q.defer();
       link += '/' + 'null';
 
-      if (service.albums[xipath]) {
+      if (service.albums['null']) {
         cb.resolve(service.albums['null']);
       } else {
         $http.get(link).then(function (res) {

@@ -10,8 +10,10 @@ angular.module('audiodio', [
   'splash',
   'resourceDirectory',
   'browse',
-  'playlist',
-  'songs',
+  'audiodio.playlist',
+  'audiodio.directives.song',
+  'audiodio.directives.song-info',
+  'audiodio.directives.artist',
   'account',
   'search',
   'history',
@@ -20,7 +22,9 @@ angular.module('audiodio', [
   'album.covers',
   'meta-data',
   'audiodio.search.artists',
-  'angular-inview'
+  'angular-inview',
+  'audiodio.metrics',
+  'audiodio.xipath'
 ])
 
   .run(function($ionicPlatform) {

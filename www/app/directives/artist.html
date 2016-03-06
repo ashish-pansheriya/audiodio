@@ -1,4 +1,5 @@
 <a in-view="vm.showMetaData($inview, position)" class="item item-thumbnail-left">
     <img ng-src="{{vm.artist.image}}">
-    <h2>{{vm.song | songNameFilter}}</h2>
+    <h2>{{vm.name}}</h2>
+    <p>Active: {{vm.artist.yearsActiveStart}} - {{vm.artist.yearsActiveEnd}}</p>
 </a>

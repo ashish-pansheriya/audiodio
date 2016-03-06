@@ -19,7 +19,10 @@ function ArtistsCtrl (links, $scope, browseArtist, directory, $state, $ionicModa
     },
     sortByName : function (model) {
       return $filter('artistTitle')(model);
-    }
+    }/*,
+    sortByYear: function (model) {
+      //TODO: query artist meta data service to get years active. this comparator will need to wait on promises
+    }*/
   };
 
   function toggleComparator() {

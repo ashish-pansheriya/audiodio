@@ -38,13 +38,11 @@
     </ion-header-bar>
 
     <ion-content class="has-header">
-      <ion-list>
-        <ion-item class="item-text-wrap" ng-repeat="s in playlist.songs() track by $index">
-          <song model="s" position="$index"></song>
-        </ion-item>
-        <ion-item>
-          <button class="button button-full button-assertive" ng-click="clearPlaylist()">Clear</button>
-        </ion-item>
+        <ion-list>
+            <song model="s" ng-repeat="s in playlist.songs()"></song>
+            <ion-item>
+              <button class="button button-full button-assertive" ng-click="clearPlaylist()">Clear</button>
+            </ion-item>
       </ion-list>
 
     </ion-content>

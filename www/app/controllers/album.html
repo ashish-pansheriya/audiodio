@@ -1,19 +1,14 @@
 
 <ion-scroll direction="y" in-view-container>
-
     <ion-list >
-
         <ion-item>
             <button class="button button-full button-assertive" ng-click="addAllSongs()">Add All</button>
         </ion-item>
-        <ion-item ng-repeat="song in songs track by $index">
-            <songinfo position="$index" ng-click="addSong(song)" model="song"></songinfo>
-        </ion-item>
+        <songinfo position="$index" ng-click="addSong(song)" model="song" ng-repeat="song in songs track by $index"></songinfo>
         <ion-item><!--SPACER--></ion-item>
         <ion-item><!--SPACER--></ion-item>
         <ion-item><!--SPACER--></ion-item>
     </ion-list>
-
 </ion-scroll>
 
 

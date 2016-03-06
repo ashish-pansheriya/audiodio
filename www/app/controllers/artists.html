@@ -1,10 +1,10 @@
 <button class="button button-balanced fab-btm-right" ng-click="vm.toggleSort()"><i class="icon" ng-class="!vm.isSortByHeat ? ' ion-connection-bars' : 'ion-stats-bars'"></i></button>
 <button class="button button-calm fab-top-right" ng-click="vm.doRefresh()"><i class="icon ion-refresh"></i></button>
-<div class="fab-scroll">
+<div class="fab-scroll" in-view-container>
   <ion-list>
-    <ion-item ng-repeat="artist in vm.artists | orderBy:vm.browseComparator">
-        <button class="button button-full button-positive" ng-click="vm.setXipath(artist.xipath)">{{artist | artistTitle}}</button>
-    </ion-item>
+
+    <artist position="$index" model="artist" ng-click="vm.setXipath(artist.xipath)" ng-repeat="artist in vm.artists | orderBy:vm.browseComparator"></artist>
+
     <ion-item><!--SPACER--></ion-item>
     <ion-item><!--SPACER--></ion-item>
     <ion-item><!--SPACER--></ion-item>
