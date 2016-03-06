@@ -10,8 +10,8 @@ angular.module('audiodio.directives.song-info', [])
       templateUrl: 'app/directives/songInfo.html'
     };
   }])
-  .controller('songInfoCtrl', ['links', '$scope', '$stateParams', 'xipath', '$state', 'session', '$timeout', 'metrics', 'user', '$rootScope', 'artistCovers',
-    function (links, $scope , $stateParams, xipath, $state, session, $timeout, metrics, user, $rootScope, artistCovers) {
+  .controller('songInfoCtrl', ['links', '$scope', '$stateParams', 'xipath', '$state', 'session', '$timeout', 'metrics', 'user', '$rootScope', 'albumCovers',
+    function (links, $scope , $stateParams, xipath, $state, session, $timeout, metrics, user, $rootScope, albumCovers) {
       //model get/set
       var vm = this;
       var loadIndexLimit = 5; //load the first few songs in either albums or playlist
@@ -31,8 +31,10 @@ angular.module('audiodio.directives.song-info', [])
       vm.getYear = getYear;
 
       vm.showMetaData = showMetaData;
-      vm.artist = {
+      vm.album = {
         xipath: '',
+        year: '',
+        title: '',
         image: "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
       };
 
@@ -44,9 +46,9 @@ angular.module('audiodio.directives.song-info', [])
         if (visible) {
 
           //load artist meta data
-          links.formUrl('artistMetaData').then(function (url) {
-            artistCovers.fetchArtistMetaData(url, vm.song.xipath.substring(0,6)).then(function (artist) {
-              vm.artist = artist;
+          links.formUrl('albumMetaData').then(function (url) {
+            albumCovers.getDefault(url, vm.song.xipath.substring(0,9)).then(function (album) {
+              vm.album = album;
             });
           });
 

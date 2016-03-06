@@ -1,64 +1,63 @@
-var station = {
-  channel: '',
-  pageSize: 25,
-  isTurnedOn: true
-};
 
-angular.module('radioServices', [])
-  .service('radioService',  ['$http', '$q',
-    function ($http, $q) {
-      var radio = {};
+angular.module('audiodio.services.radio', [])
 
-      radio.fetchSongs = function (link, userId) {
-        var cb = $q.defer();
+.service('radioService', radio);
+radio.$inject = ['$http', '$q'];
 
-        link += userId;
-        link += '/' + station.channel;
-
-        $http.get(link).then(function (response) {
-            cb.resolve(response.data);
-          },
-          function (err) {
-            cb.resolve([]);
-          });
-
-        return cb.promise;
-      };
-      return radio;
-    }])
-  .service('channelTuner',  ['$http', '$q',
-    function ($http, $q) {
-      var tuner = {};
-
-      tuner.turnOn = function () {
-        station.isTurnedOn = true;
-      };
-      tuner.turnOff = function () {
-        station.isTurnedOn = false;
-      };
-
-      tuner.isRadioOn = function () {
-        return station.isTurnedOn;
-      };
-
-      tuner.fetchChannels = function (link) {
-        var cb = $q.defer();
-        $http.get(link).then(function (response) {
-            cb.resolve(response.data.channels);
-          },
-          function (err) {
-            cb.resolve([]);
-          });
-        return cb.promise;
-      };
-
-      tuner.changeChannel = function (channel) {
-        station.channel = channel;
-        console.log(channel); //TESTING!!!
-      };
-      tuner.tuneIn = tuner.changeChannel; //cool overload xD
+function radio ($http, $q) {
+  var service = {
+    station: {
+      channel: '',
+      pageSize: 25, //coupled to backend
+      isTurnedOn: true
+    },
+    fetchSongs: fetchSongs,
+    turnOn: turnOn,
+    turnOff: turnOff,
+    isRadioOn: isRadioOn,
+    fetchChannels: fetchChannels,
+    changeChannel: changeChannel,
+    tuneIn: changeChannel
+  };
 
 
-      return tuner;
-    }]);
 
+  function fetchSongs (link, userId) {
+    var cb = $q.defer();
+
+    link += userId;
+    link += '/' + service.station.channel;
+
+    $http.get(link).then(function (response) {
+        cb.resolve(response.data);
+      },
+      function (err) {
+        cb.resolve([]);
+      });
+
+    return cb.promise;
+  }
+  function turnOn () {
+    service.station.isTurnedOn = true;
+  }
+  function turnOff () {
+    service.station.isTurnedOn = false;
+  }
+  function isRadioOn () {
+    return service.station.isTurnedOn;
+  }
+  function fetchChannels (link) {
+    var cb = $q.defer();
+    $http.get(link).then(function (response) {
+        cb.resolve(response.data.channels);
+      },
+      function (err) {
+        cb.resolve([]);
+      });
+    return cb.promise;
+  }
+  function changeChannel (channel) {
+    service.station.channel = channel;
+  }
+  return service;
+}

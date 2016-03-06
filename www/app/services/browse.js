@@ -51,7 +51,7 @@ angular.module('browse', [])
     $http.get(link).then(function (response) {
         cb.resolve(response.data.children);
       },
-      function (err){
+      function (err) {
         cb.resolve([]);
       });
 

@@ -17,8 +17,8 @@ angular.module('audiodio', [
   'account',
   'search',
   'history',
-  'radioStuff',
-  'radioServices',
+  'radioStuff', //radio view
+  'audiodio.services.radio',
   'album.covers',
   'meta-data',
   'audiodio.search.artists',

@@ -11,8 +11,8 @@ angular.module('audiodio.directives.song', ['angular-inview'])
     templateUrl: 'app/directives/song.html'
   };
 }])
-.controller('songCtrl', ['links', '$scope', '$stateParams', 'xipath', '$state', 'session', '$timeout', 'metrics', 'user', '$rootScope', 'albumCovers',
-  function (links, $scope , $stateParams, xipath, $state, session, $timeout, metrics, user, $rootScope, albumCovers) {
+.controller('songCtrl', ['links', '$scope', '$stateParams', 'xipath', '$state', 'session', '$timeout', 'metrics', 'user', '$rootScope', 'artistCovers',
+  function (links, $scope , $stateParams, xipath, $state, session, $timeout, metrics, user, $rootScope, artistCovers) {
     //model get/set
     var vm = this;
     vm.showSong = showSong;
@@ -41,10 +41,9 @@ angular.module('audiodio.directives.song', ['angular-inview'])
     vm.next = next;
     vm.isSongInContext = isSongInContext;
     vm.volume = 50.0;
-    vm.album = {
+
+    vm.artist = {
       xipath: '',
-      year: '',
-      title: '',
       image: "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
     };
     vm.song = {
@@ -64,10 +63,10 @@ angular.module('audiodio.directives.song', ['angular-inview'])
 
     function showMetaData() {
 
-        //load album meta data //TODO: change getDefault to fetch once we have a substantial percentage of album data inputed
-        links.formUrl('albumMetaData').then(function (url) {
-          albumCovers.getDefault(url, vm.song.xipath.substring(0,9)).then(function (album) {
-            vm.album = album;
+        //load artist meta data
+        links.formUrl('artistMetaData').then(function (url) {
+          artistCovers.fetchArtistMetaData(url, vm.song.xipath.substring(0,6)).then(function (artist) {
+            vm.artist = artist;
           });
         });
 
