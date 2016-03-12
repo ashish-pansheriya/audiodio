@@ -1,6 +1,9 @@
 audiodio
 ========
 
+gulp build --user <sam,will>
+ionic run android
+
 This repository is a collection of machine specific scripts intended to facilitate the manage of the
 music archive served up by the audiodio player.
 

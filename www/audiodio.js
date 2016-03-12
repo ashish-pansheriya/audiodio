@@ -86,7 +86,7 @@ angular.module('audiodio', [
         url: '/audiodio',
         abstract: true,
         templateUrl: 'app/controllers/frame.html',
-        controller: 'frameCtrl',
+        controller: 'frameCtrl as vm',
         cache:false
       })
       .state('app.welcome', {
@@ -139,7 +139,7 @@ angular.module('audiodio', [
         views: {
           'mainContent': {
             templateUrl: 'app/controllers/channels.html',
-            controller: 'channelsCtrl'
+            controller: 'channelsCtrl as vm'
           }
         }
       })
@@ -161,279 +161,6 @@ angular.module('audiodio', [
     };
   }]);
 
-angular.module('audiodio.search.artists', [])
-
-.controller('ArtistsCtrl', ArtistsCtrl);
-
-ArtistsCtrl.$inject = ['links', '$scope', 'browseArtist', 'directory', '$state', '$ionicModal', '$filter', 'user', '$timeout'];
-
-function ArtistsCtrl (links, $scope, browseArtist, directory, $state, $ionicModal, $filter, user, $timeout) {
-  var vm = this;
-  vm.artists = [];
-  vm.setXipath = setXipath;
-  vm.doRefresh = fetchArtists;
-  vm.toggleSort = toggleComparator;
-  vm.isSortByHeat = true;
-
-  vm.sortPopup = null;
-  vm.comparators = {
-    sortByHeat : function (model) {
-      return -1 * model.heat;
-    },
-    sortByName : function (model) {
-      return $filter('artistTitle')(model);
-    }/*,
-    sortByYear: function (model) {
-      //TODO: query artist meta data service to get years active. this comparator will need to wait on promises
-    }*/
-  };
-
-  function toggleComparator() {
-    vm.isSortByHeat = !vm.isSortByHeat;
-    if (vm.isSortByHeat) {
-      vm.browseComparator =  vm.comparators.sortByHeat;
-    } else {
-      vm.browseComparator =  vm.comparators.sortByName;
-    }
-
-    //force re render
-    $timeout(function () {
-      $scope.$apply();
-    });
-  }
-
-  function setXipath (xi) {
-    directory.setContext(xi);
-    $state.go('app.albums', {reload: true});
-  }
-
-  function fetchArtists() {
-    links.formUrl('searchByArtist').then(function (url) {
-      browseArtist.getAll(url, user.getId(), '').then(function (artists) {
-        vm.artists = artists;
-        $scope.$broadcast('scroll.refreshComplete');
-      });
-    });
-  }
-
-  fetchArtists();
-}
-angular.module('frame', [])
-  .controller('frameCtrl', ['$rootScope', '$scope', '$ionicModal', 'session', 'xipath', 'links', 'user', '$ionicHistory', '$location', '$state', 'radioService',  function ($rootScope, $scope, $ionicModal, session, xipath, links, user, $ionicHistory, $location, $state, radioService) {
-
-    $scope.playlist = {
-      songs: [],
-      playlistName: ''
-    };
-
-    //bind to playlist collection
-    $scope.playlist.songs = session.getSongs;
-
-    //bind playlist recording
-    $scope.playlist.playlistName = session.getPlaylistName();
-
-/*    function popState(state) {
-      var pieces = state.split('.');
-      pieces = pieces.splice(0, pieces.length - 1);
-      return pieces.join('');
-    }*/
-    $scope.savePlaylist = function () {
-      links.formUrl('savePlaylist').then(function (url) {
-        session.setPlaylistName($scope.playlist.playlistName);
-        session.savePlaylist(url, user.getId()).then(function (success) {
-          //success is boolean
-        });
-      });
-    };
-
-    $scope.clearPlaylist = function () {
-      session.clearSongs();
-    };
-
-    $scope.goBack = function() {
-      $ionicHistory.goBack();
-    };
-
-  }]);
-
-angular.module('history', [])
-.controller('playlistsCtrl', ['links', '$scope', 'browseAlbum', '$stateParams', 'session', 'user', '$state', function (links, $scope, browseAlbum , $stateParams, session, user, $state) {
-    $scope.lists = [];
-
-    $scope.showList = function (list) {
-      session.holdPlaylist(list.songs);
-      $state.go('app.playlist');
-    };
-    $scope.deleteList = function (list) {
-      links.formUrl('savePlaylist').then(function (link) {
-        session.removePlaylist(link, user.getId(), list.name).then(function (success) {
-          if (success) {
-            $scope.getLists();
-          }
-        });
-      });
-    };
-    $scope.getLists = function () {
-      links.formUrl('playlists').then(function (link) {
-        session.getPlaylists(link, user.getId()).then(function (lists) {
-          $scope.lists = lists;
-        });
-      });
-    };
-
-    $scope.getLists();
-}])
-.controller('playlistCtrl', ['links', '$scope', 'browseAlbum', '$stateParams', 'directory', 'session', 'user', '$state', '$controller', '$stateParams', function (links, $scope, browseAlbum , $stateParams, directory, session, user, $state, $controller, $stateParams) {
-  //inherit songs controller
-  $controller('songsCtrl', {$scope: $scope});
-
-  //models
-  $scope.songs  = session.getHeldPlaylist();
-
-
-}]);
-
-angular.module('radioStuff', [])
-.controller('channelsCtrl', ChannelsCtrl);
-
-  ChannelsCtrl.$inject = ['$rootScope', '$scope', 'links', '$state', 'radioService', 'user', 'session', 'xipath'];
-  function ChannelsCtrl ($rootScope, $scope, links, $state, radioService, user, session, xipath) {
-
-  $scope.channelOptions = [
-  ];
-  $scope.channel = {
-    url: 'b'
-  };
-
-  $scope.changeChannel = function (val) {
-    radioService.changeChannel(val);
-    $rootScope.$broadcast('radio:continue');
-  };
-
-  links.formUrl('radioChannels').then(function (url) {
-    radioService.fetchChannels(url).then(function (channels) {
-      $scope.channelOptions = channels;
-    });
-  });
-
-  function listenToRadio () {
-    links.formUrl('radio').then(function (url) {
-      radioService.fetchSongs(url, user.getId()).then(function (songs) {
-        for (var s in songs) {
-          session.add(songs[s]);
-        }
-      });
-    });
-  }
-  $rootScope.$on('radio:continue', function (e) {
-    //determine if need to fetch more songs
-    var radioFetchThreshold = 1; //fetch more songs when listening to last song
-    if ($state.current.name.indexOf('app.radio') > -1 && session.playlist.length - session.indexOfSongByXipath(xipath.getContext()) <= radioFetchThreshold ) {
-      listenToRadio();
-    }
-  });
-}
-angular.module('search', [])
-  .controller('albumsCtrl', ['links', '$scope', 'browseAlbum', '$stateParams', 'directory', '$state', function (links, $scope, browseAlbum , $stateParams, directory, $state) {
-
-    $scope.xipath    = directory.getContext();
-    $scope.albums    = [];
-
-    if ($scope.xipath.length > 0) {
-      links.formUrl('getDirectories').then(function (url) {
-        browseAlbum.getAtXipath(url, $scope.xipath).then(function (albums) {
-          $scope.albums = albums;
-        });
-      });
-    }
-  }])
-  .controller('songsCtrl', ['links', '$scope', 'browseAlbum', '$stateParams', 'directory', 'session', 'user', '$state', function (links, $scope, browseAlbum , $stateParams, directory, session, user, $state) {
-    $scope.songs  = [];
-    $scope.addSong = function (song) {
-      //xipath.setContext(song.xipath);
-      session.add(song);
-      links.formUrl('savePlaylist').then(function (url) {
-        session.resetPlaylistName();
-        session.savePlaylist(url, user.getId()).then(function (success) {
-          //success is boolean
-        });
-      });
-    };
-    $scope.addAllSongs = function () {
-      if ($scope.songs.length > 0) {
-        for (var s in $scope.songs) {
-          session.add($scope.songs[s]);
-        }
-        links.formUrl('savePlaylist').then(function (url) {
-          session.resetPlaylistName();
-          session.savePlaylist(url, user.getId()).then(function (success) {
-            //success is boolean
-          });
-        });
-      }
-    };
-  }])
-  .controller('albumCtrl', ['links', '$scope', 'browseAlbum', '$stateParams', 'directory', 'session', 'user', '$controller', function (links, $scope, browseAlbum , $stateParams, directory, session, user, $controller) {
-    //inherit songs controller
-    $controller('songsCtrl', {$scope: $scope});
-
-    //models
-    $scope.xipath = directory.getContext();
-
-
-    if ($scope.xipath.length > 0) {
-      links.formUrl('getDirectories').then(function (url) {
-        browseAlbum.getAtXipath(url, $scope.xipath).then(function (songs) {
-          $scope.songs = songs;
-        });
-      });
-    }
-  }])
-  .filter('albumNameFilter', function () {
-    return function (album) {
-      if (album.name) {
-        return album.name.substring(3, album.name.length - 1);
-      } else {
-        return '';
-      }
-
-    };
-  })
-  .filter('artistTitle', function () {
-    return function (artist) {
-      if (artist.name) {
-        return artist.name.substring(3, artist.name.length - 1) + ' - ' + Math.ceil(artist.heat);
-      } else {
-        return '';
-      }
-
-    };
-  })
-  .filter('songNameFilter', function () {
-    return function (song) {
-      if (song.name) {
-        return song.name.substring(3, song.name.length - 4);
-      } else {
-        return '';
-      }
-
-    };
-  });
-
-
-
-angular.module('splash', [
-  'account'
-])
-
-.controller('splashCtrl', SplashCtrl);
-
-SplashCtrl.$inject = ['$scope', 'user'];
-
-function SplashCtrl ($scope, user) {
-  var vm = this;
-  vm.username = user.getId();
-}
 <!--song in playlist-->
 angular.module('album.covers', [])
   .directive('albumSleeve', [function () {
@@ -692,7 +419,7 @@ angular.module('audiodio.directives.song', ['angular-inview'])
         $audio.addEventListener('ended', vm.next);
       }
 
-      $rootScope.$broadcast('radio:continue');
+      $scope.$emit('song:load');
 
       links.formUrl('recordPlay').then(function (url) {
         metrics.recordSongPlayedByXipath(url, vm.song.xipath, user.getId()).then(function (success) {
@@ -844,6 +571,294 @@ angular.module('audiodio.directives.song-info', [])
       }
     }]);
 
+angular.module('audiodio.search.artists', [])
+
+.controller('ArtistsCtrl', ArtistsCtrl);
+
+ArtistsCtrl.$inject = ['links', '$scope', 'browseArtist', 'directory', '$state', '$ionicModal', '$filter', 'user', '$timeout'];
+
+function ArtistsCtrl (links, $scope, browseArtist, directory, $state, $ionicModal, $filter, user, $timeout) {
+  var vm = this;
+  vm.artists = [];
+  vm.setXipath = setXipath;
+  vm.doRefresh = fetchArtists;
+  vm.toggleSort = toggleComparator;
+  vm.isSortByHeat = true;
+
+  vm.sortPopup = null;
+  vm.comparators = {
+    sortByHeat : function (model) {
+      return -1 * model.heat;
+    },
+    sortByName : function (model) {
+      return $filter('artistTitle')(model);
+    }/*,
+    sortByYear: function (model) {
+      //TODO: query artist meta data service to get years active. this comparator will need to wait on promises
+    }*/
+  };
+
+  function toggleComparator() {
+    vm.isSortByHeat = !vm.isSortByHeat;
+    if (vm.isSortByHeat) {
+      vm.browseComparator =  vm.comparators.sortByHeat;
+    } else {
+      vm.browseComparator =  vm.comparators.sortByName;
+    }
+
+    //force re render
+    $timeout(function () {
+      $scope.$apply();
+    });
+  }
+
+  function setXipath (xi) {
+    directory.setContext(xi);
+    $state.go('app.albums', {reload: true});
+  }
+
+  function fetchArtists() {
+    links.formUrl('searchByArtist').then(function (url) {
+      browseArtist.getAll(url, user.getId(), '').then(function (artists) {
+        vm.artists = artists;
+        $scope.$broadcast('scroll.refreshComplete');
+      });
+    });
+  }
+
+  fetchArtists();
+}
+angular.module('frame', [])
+  .controller('frameCtrl', FrameCtrl);
+  FrameCtrl.$inject = ['$rootScope', '$scope', '$ionicModal', 'session', 'xipath', 'links', 'user', '$ionicHistory', '$location', '$state', 'radioService'];
+  function FrameCtrl ($rootScope, $scope, $ionicModal, session, xipath, links, user, $ionicHistory, $location, $state, radioService) {
+    var vm = this;
+    vm.playlist = {
+      songs: [],
+      playlistName: ''
+    };
+    vm.playlist.songs = session.getSongs; //bind to playlist collection
+    vm.playlist.playlistName = session.getPlaylistName();//bind playlist recording
+    vm.savePlaylist = savePlaylist;
+    vm.clearPlaylist = clearPlaylist;
+    vm.goBack = goBack;
+
+    vm.listenToRadio = false;
+    vm.isRadioOn = isRadioOn; //has the service been configured yet? channel set yet?
+    vm.toggleRadio = toggleRadio; //continuous play after radio is turned on
+    vm.shufflePlaylist = shufflePlaylist;
+
+    $scope.$on('song:load', function (e) {
+        listenToRadio();
+    });
+
+
+    function shufflePlaylist () {
+      //TODO: shuffle playlist
+    }
+    function isRadioOn () {
+      return radioService.isRadioOn();
+    }
+    function toggleRadio () {
+      listenToRadio();
+    }
+    function savePlaylist () {
+      //TODO: show popup
+/*      links.formUrl('savePlaylist').then(function (url) {
+        session.setPlaylistName($scope.playlist.playlistName);
+        session.savePlaylist(url, user.getId()).then(function (success) {
+          //success is boolean
+        });
+      });*/
+    }
+
+
+    function clearPlaylist () {
+      session.clearSongs();
+    }
+
+
+    function goBack () {
+      $ionicHistory.goBack();
+    }
+
+    function listenToRadio () {
+      //determine if need to fetch more songs
+      if (vm.listenToRadio && session.playlist.length - session.indexOfSongByXipath(xipath.getContext()) <= 1) {
+        links.formUrl('radio').then(function (url) {
+          radioService.fetchSongs(url, user.getId()).then(function (songs) {
+            for (var s in songs) {
+              session.add(songs[s]);
+            }
+          });
+        });
+      }
+    }
+
+  }
+
+angular.module('history', [])
+.controller('playlistsCtrl', ['links', '$scope', 'browseAlbum', '$stateParams', 'session', 'user', '$state', function (links, $scope, browseAlbum , $stateParams, session, user, $state) {
+    $scope.lists = [];
+
+    $scope.showList = function (list) {
+      session.holdPlaylist(list.songs);
+      $state.go('app.playlist');
+    };
+    $scope.deleteList = function (list) {
+      links.formUrl('savePlaylist').then(function (link) {
+        session.removePlaylist(link, user.getId(), list.name).then(function (success) {
+          if (success) {
+            $scope.getLists();
+          }
+        });
+      });
+    };
+    $scope.getLists = function () {
+      links.formUrl('playlists').then(function (link) {
+        session.getPlaylists(link, user.getId()).then(function (lists) {
+          $scope.lists = lists;
+        });
+      });
+    };
+
+
+    $scope.getLists();
+}])
+.controller('playlistCtrl', ['links', '$scope', 'browseAlbum', '$stateParams', 'directory', 'session', 'user', '$state', '$controller', '$stateParams', function (links, $scope, browseAlbum , $stateParams, directory, session, user, $state, $controller, $stateParams) {
+  //inherit songs controller
+  $controller('songsCtrl', {$scope: $scope});
+
+  //models
+  $scope.songs  = session.getHeldPlaylist();
+
+
+}]);
+
+angular.module('radioStuff', [])
+.controller('channelsCtrl', ChannelsCtrl);
+
+  ChannelsCtrl.$inject = ['$rootScope', '$scope', 'links', '$state', 'radioService', 'user', 'session', 'xipath'];
+  function ChannelsCtrl ($rootScope, $scope, links, $state, radioService, user, session, xipath) {
+    var vm = this;
+    vm.channelOptions = [];
+    vm.changeChannel = changeChannel;
+
+  links.formUrl('radioChannels').then(function (url) {
+    radioService.fetchChannels(url).then(function (channels) {
+      vm.channelOptions = channels;
+    });
+  });
+
+  function changeChannel (val) {
+    radioService.turnOn();
+    radioService.changeChannel(val);
+    //$rootScope.$broadcast('radio:continue');
+  }
+
+
+}
+angular.module('search', [])
+  .controller('albumsCtrl', ['links', '$scope', 'browseAlbum', '$stateParams', 'directory', '$state', function (links, $scope, browseAlbum , $stateParams, directory, $state) {
+
+    $scope.xipath    = directory.getContext();
+    $scope.albums    = [];
+
+    if ($scope.xipath.length > 0) {
+      links.formUrl('getDirectories').then(function (url) {
+        browseAlbum.getAtXipath(url, $scope.xipath).then(function (albums) {
+          $scope.albums = albums;
+        });
+      });
+    }
+  }])
+  .controller('songsCtrl', ['links', '$scope', 'browseAlbum', '$stateParams', 'directory', 'session', 'user', '$state', function (links, $scope, browseAlbum , $stateParams, directory, session, user, $state) {
+    $scope.songs  = [];
+    $scope.addSong = function (song) {
+      //xipath.setContext(song.xipath);
+      session.add(song);
+      links.formUrl('savePlaylist').then(function (url) {
+        session.resetPlaylistName();
+        session.savePlaylist(url, user.getId()).then(function (success) {
+          //success is boolean
+        });
+      });
+    };
+    $scope.addAllSongs = function () {
+      if ($scope.songs.length > 0) {
+        for (var s in $scope.songs) {
+          session.add($scope.songs[s]);
+        }
+        links.formUrl('savePlaylist').then(function (url) {
+          session.resetPlaylistName();
+          session.savePlaylist(url, user.getId()).then(function (success) {
+            //success is boolean
+          });
+        });
+      }
+    };
+  }])
+  .controller('albumCtrl', ['links', '$scope', 'browseAlbum', '$stateParams', 'directory', 'session', 'user', '$controller', function (links, $scope, browseAlbum , $stateParams, directory, session, user, $controller) {
+    //inherit songs controller
+    $controller('songsCtrl', {$scope: $scope});
+
+    //models
+    $scope.xipath = directory.getContext();
+
+
+    if ($scope.xipath.length > 0) {
+      links.formUrl('getDirectories').then(function (url) {
+        browseAlbum.getAtXipath(url, $scope.xipath).then(function (songs) {
+          $scope.songs = songs;
+        });
+      });
+    }
+  }])
+  .filter('albumNameFilter', function () {
+    return function (album) {
+      if (album.name) {
+        return album.name.substring(3, album.name.length - 1);
+      } else {
+        return '';
+      }
+
+    };
+  })
+  .filter('artistTitle', function () {
+    return function (artist) {
+      if (artist.name) {
+        return artist.name.substring(3, artist.name.length - 1) + ' - ' + Math.ceil(artist.heat);
+      } else {
+        return '';
+      }
+
+    };
+  })
+  .filter('songNameFilter', function () {
+    return function (song) {
+      if (song.name) {
+        return song.name.substring(3, song.name.length - 4);
+      } else {
+        return '';
+      }
+
+    };
+  });
+
+
+
+angular.module('splash', [
+  'account'
+])
+
+.controller('splashCtrl', SplashCtrl);
+
+SplashCtrl.$inject = ['$scope', 'user'];
+
+function SplashCtrl ($scope, user) {
+  var vm = this;
+  vm.username = user.getId();
+}
 /*var user = {
   id: 'will',
   token: null
@@ -1040,7 +1055,7 @@ angular.module('audiodio.playlist', [])
 
     session.temp = [];
     session.playlist = [];
-    session.playlistName = 'Recently Played';
+    session.playlistName = 'Recently Played'; //DEPRECATED
     session.getSongs = function () {
       return session.playlist;
     };
@@ -1191,7 +1206,7 @@ function radio ($http, $q) {
     station: {
       channel: '',
       pageSize: 25, //coupled to backend
-      isTurnedOn: true
+      isTurnedOn: false
     },
     fetchSongs: fetchSongs,
     turnOn: turnOn,

@@ -1,3 +1,3 @@
 <ion-scroll direction="y">
-    <ion-radio ng-repeat="option in channelOptions" ng-value="option.url" ng-model="channel.url" ng-change="changeChannel(option.url)"> {{ option.title }}</ion-radio>
+    <ion-radio ng-repeat="option in vm.channelOptions" ng-value="option.url" ng-model="channel.url" ng-change="vm.changeChannel(option.url)"> {{ option.title }}</ion-radio>
 </ion-scroll>

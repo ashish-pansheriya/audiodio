@@ -8,7 +8,7 @@ angular.module('audiodio.playlist', [])
 
     session.temp = [];
     session.playlist = [];
-    session.playlistName = 'Recently Played';
+    session.playlistName = 'Recently Played'; //DEPRECATED
     session.getSongs = function () {
       return session.playlist;
     };

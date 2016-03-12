@@ -81,7 +81,7 @@ angular.module('audiodio', [
         url: '/audiodio',
         abstract: true,
         templateUrl: 'app/controllers/frame.html',
-        controller: 'frameCtrl',
+        controller: 'frameCtrl as vm',
         cache:false
       })
       .state('app.welcome', {
@@ -134,7 +134,7 @@ angular.module('audiodio', [
         views: {
           'mainContent': {
             templateUrl: 'app/controllers/channels.html',
-            controller: 'channelsCtrl'
+            controller: 'channelsCtrl as vm'
           }
         }
       })

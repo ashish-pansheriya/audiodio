@@ -23,6 +23,7 @@ angular.module('history', [])
       });
     };
 
+
     $scope.getLists();
 }])
 .controller('playlistCtrl', ['links', '$scope', 'browseAlbum', '$stateParams', 'directory', 'session', 'user', '$state', '$controller', '$stateParams', function (links, $scope, browseAlbum , $stateParams, directory, session, user, $state, $controller, $stateParams) {

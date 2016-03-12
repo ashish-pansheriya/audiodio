@@ -132,7 +132,7 @@ angular.module('audiodio.directives.song', ['angular-inview'])
         $audio.addEventListener('ended', vm.next);
       }
 
-      $rootScope.$broadcast('radio:continue');
+      $scope.$emit('song:load');
 
       links.formUrl('recordPlay').then(function (url) {
         metrics.recordSongPlayedByXipath(url, vm.song.xipath, user.getId()).then(function (success) {

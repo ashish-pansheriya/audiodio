@@ -9,7 +9,7 @@ function radio ($http, $q) {
     station: {
       channel: '',
       pageSize: 25, //coupled to backend
-      isTurnedOn: true
+      isTurnedOn: false
     },
     fetchSongs: fetchSongs,
     turnOn: turnOn,
