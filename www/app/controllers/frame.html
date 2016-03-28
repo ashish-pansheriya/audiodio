@@ -20,7 +20,7 @@
 
     <ion-footer-bar align-title="left" class="bar-dark">
       <ion-tabs class="tabs-dark tabs-icon-top">
-          <ion-tab title="Profile" icon-on="ion-android-contact" icon-off="ion-android-contact-outline" ui-sref="app.welcome">You</ion-tab>
+          <ion-tab title="News" icon-on="ion-android-contact" icon-off="ion-android-contact-outline" ui-sref="app.welcome">You</ion-tab>
           <ion-tab title="Browse" icon-on="ion-android-search" icon-off="ion-android-search-outline" ui-sref="app.artists">Browse</ion-tab>
           <ion-tab title="Playlists" icon-on="ion-ios-list-outline" icon-off="ion-ios-list-outline-outline" ui-sref="app.playlists">Playlists</ion-tab>
           <ion-tab title="Radio" icon-on="ion-radio-waves" icon-off="ion-radio-waves-outline" ui-sref="app.radio">Radio</ion-tab>
@@ -46,6 +46,14 @@
 
     <ion-content class="has-header">
         <ion-list>
+            <ion-item ng-if="vm.playlist.songs().length < 1">
+                <p>Looks like you don't have any songs to play.</p>
+                <p>Select browse.</p>
+                <p>Select an artist.</p>
+                <p>Select an album.</p>
+                <p>Select your songs.</p>
+                <p>Click a song in this list to play it.</p>
+            </ion-item>
             <song model="s" ng-repeat="s in vm.playlist.songs()"></song>
       </ion-list>
 
