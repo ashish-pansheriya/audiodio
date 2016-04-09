@@ -150,6 +150,7 @@ function SongCtrl (links, $scope , xipath, session, $timeout, metrics, user, art
       $timeout(function () {
         var $scrollToMe = document.getElementById('scroll#' + xipath.getContext());
         $ionicScrollDelegate.scrollBy(0, $scrollToMe.offsetTop - $ionicScrollDelegate.getScrollPosition().top, true);
+        $ionicScrollDelegate.freezeScroll(false);
       }, 1 * 1000);
       $audio.load();
       $audio.play();
