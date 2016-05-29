@@ -1,5 +1,5 @@
 <div id="scroll#{{vm.song.xipath}}" ng-click="vm.showSong(vm.song)" on-swipe-right="vm.removeSong(vm.song)" on-swipe-left="vm.removeSong(vm.song)" class="item item-thumbnail-left">
-    <img ng-src="{{vm.artist.image}}">
+    <img ng-if="vm.isSongInContext(vm.song.xipath)" ng-src="{{vm.artist.image}}">
     <h2>{{vm.song | songNameFilter}}</h2>
     <p>{{vm.song | artistNameFilter}}</p>
     <p>{{vm.album.year}}</p>

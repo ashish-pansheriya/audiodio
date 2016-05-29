@@ -22,6 +22,7 @@ angular.module('audiodio', [
   'album.covers',
   'meta-data',
   'audiodio.search.artists',
+  'audiodio.search.albums',
   'angular-inview',
   'audiodio.metrics',
   'audiodio.xipath'
@@ -107,7 +108,7 @@ angular.module('audiodio', [
         views: {
           'mainContent': {
             templateUrl: 'app/controllers/albums.html',
-            controller: 'albumsCtrl'
+            controller: 'albumsCtrl as vm'
           }
         }
       })

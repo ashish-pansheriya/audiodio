@@ -1,17 +1,10 @@
-
-<!--<div class="bar bar-header">
-  <h1 class="title">Artist Albums</h1>
-</div>-->
 <ion-scroll direction="y">
-
     <ion-list>
-        <ion-item ng-repeat="album in albums">
+        <ion-item ng-repeat="album in vm.albums">
             <album-sleeve model="album"></album-sleeve>
         </ion-item>
         <ion-item><!--SPACER--></ion-item>
         <ion-item><!--SPACER--></ion-item>
         <ion-item><!--SPACER--></ion-item>
     </ion-list>
-
 </ion-scroll>
-

@@ -146,12 +146,8 @@ function SongCtrl (links, $scope , xipath, session, $timeout, metrics, user, art
   function load () {
     var $audio = document.getElementById(xipath.getContext());
     if ($audio) {
-      //.$getByHandle(xipath.getContext()).scrollTop();
-      $timeout(function () {
-        var $scrollToMe = document.getElementById('scroll#' + xipath.getContext());
-        $ionicScrollDelegate.scrollBy(0, $scrollToMe.offsetTop - $ionicScrollDelegate.getScrollPosition().top, true);
-        $ionicScrollDelegate.freezeScroll(false);
-      }, 1 * 1000);
+
+
       $audio.load();
       $audio.play();
       $audio.addEventListener('ended', vm.next);

@@ -1,17 +1,5 @@
 angular.module('search', [])
-  .controller('albumsCtrl', ['links', '$scope', 'browseAlbum', '$stateParams', 'directory', '$state', function (links, $scope, browseAlbum , $stateParams, directory, $state) {
 
-    $scope.xipath    = directory.getContext();
-    $scope.albums    = [];
-
-    if ($scope.xipath.length > 0) {
-      links.formUrl('getDirectories').then(function (url) {
-        browseAlbum.getAtXipath(url, $scope.xipath).then(function (albums) {
-          $scope.albums = albums;
-        });
-      });
-    }
-  }])
   .controller('songsCtrl', ['links', '$scope', 'browseAlbum', '$stateParams', 'directory', 'session', 'user', '$state', function (links, $scope, browseAlbum , $stateParams, directory, session, user, $state) {
     $scope.songs  = [];
     $scope.addSong = function (song) {

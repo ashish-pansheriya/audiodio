@@ -1,13 +1,10 @@
 <div class="list card">
-    <div class="item item-avatar">
-        <h2>{{getAlbumName()}}</h2>
-        <p>{{getAlbumYear()}}</p>
+    <div class="item item-avatar" ng-click="vm.isExpanded = !vm.isExpanded">
+        <h2>{{vm.getAlbumName()}}</h2>
+        <p>{{vm.getAlbumYear()}}</p>
     </div>
-    <div ng-click="showAlbum()" class="item item-image">
-        <img ng-src="{{meta.image}}"/>
+    <div ng-class="vm.isExpanded ? 'item-expand active' : 'item-expand inactive'" class="item item-image">
+        <img ng-src="{{vm.meta.image}}" ng-click="vm.isExpanded ? vm.showAlbum() : vm.isExpanded = true;"/>
     </div>
-    <a class="item item-icon-left assertive" ng-click="addAllSongs()">
-        <i class="fa fa-plus-square"></i>
-        Add All
-    </a>
+
 </div>

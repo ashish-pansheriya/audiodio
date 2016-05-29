@@ -1,4 +1,6 @@
 node_modules/
 platforms/
 plugins/
-.idea
+.idea/
+www/lib/
+bower_components/
