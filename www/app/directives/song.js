@@ -134,14 +134,7 @@ function SongCtrl (links, $scope , xipath, session, $timeout, metrics, user, art
   }
 
 
-  function isSongPlaying () {
-    var $audio = document.getElementById(xipath.getContext());
-    if ($audio) {
-      return !$audio.paused;
-    } else {
-      return false;
-    }
-  }
+
 
   function load () {
     var $audio = document.getElementById(xipath.getContext());
@@ -164,6 +157,14 @@ function SongCtrl (links, $scope , xipath, session, $timeout, metrics, user, art
         }
       })
     });
+  }
+  function isSongPlaying () {
+    var $audio = document.getElementById(xipath.getContext());
+    if ($audio) {
+      return !$audio.paused;
+    } else {
+      return false;
+    }
   }
   function play () {
 
@@ -189,7 +190,6 @@ function SongCtrl (links, $scope , xipath, session, $timeout, metrics, user, art
     }
   }
   function next () {
-    console.log('attempting to skip to next song'); //TESTING!!!
     var nxt = session.getNextXipath(xipath.getContext());
 
     $timeout(function () {

@@ -12,17 +12,53 @@ angular.module('frame', [])
     vm.savePlaylist = savePlaylist;
     vm.clearPlaylist = clearPlaylist;
     vm.goBack = goBack;
-
+    vm.getCurrentSongName = getCurrentSongName;
     vm.listenToRadio = false;
     vm.isRadioOn = isRadioOn; //has the service been configured yet? channel set yet?
     vm.toggleRadio = toggleRadio; //continuous play after radio is turned on
     vm.shufflePlaylist = shufflePlaylist;
+    vm.isPlaying = isSongPlaying;
+    vm.togglePlayingState = togglePlayingState;
 
     $scope.$on('song:load', function (e) {
         listenToRadio();
     });
 
-
+    function isSongPlaying () {
+      var $audio = document.getElementById(xipath.getContext());
+      if ($audio) {
+        return !$audio.paused;
+      } else {
+        return false;
+      }
+    }
+    function play () {
+      var $audio = document.getElementById(xipath.getContext());
+      if ($audio) {
+        $audio.play();
+      }
+    }
+    function pause () {
+      var $audio = document.getElementById(xipath.getContext());
+      if ($audio) {
+        $audio.pause();
+      }
+    }
+    function togglePlayingState () {
+      if (isSongPlaying()) {
+        pause();
+      } else {
+        play();
+      }
+    }
+    function getCurrentSongName () {
+      var xi = xipath.getContext();
+      if (xi.length > 0) {
+        return session.getSongByXipath(xi);
+      } else {
+        return '';
+      }
+    }
     function shufflePlaylist () {
       //TODO: shuffle playlist
     }

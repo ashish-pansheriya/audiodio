@@ -1,16 +1,14 @@
 <ion-side-menus enable-menu-with-back-views="true">
   <ion-side-menu-content>
     <ion-nav-bar class="bar-dark">
-
-      <ion-nav-buttons side="left">
+        <ion-nav-buttons side="left">
           <button class="button button-icon button-clear ion-navicon" menu-toggle="left"></button>
-      </ion-nav-buttons>
-        <ion-nav-buttons side="right">
-            <button style="margin-left: 100px;" class="button button-icon ion-ios-undo" ng-click="vm.goBack()"></button>
         </ion-nav-buttons>
-
+        <ion-nav-buttons side="right">
+            <button ng-if="!vm.isPlaying()" style="margin-left: 100px;" class="button button-icon ion-play" ng-click="vm.togglePlayingState()"></button>
+            <button ng-if="vm.isPlaying()" style="margin-left: 100px;" class="button button-icon ion-pause" ng-click="vm.togglePlayingState()"></button>
+        </ion-nav-buttons>
     </ion-nav-bar>
-
 
     <!--<ion-header-bar align-title="left" class="bar-positive">
 

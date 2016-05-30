@@ -37,6 +37,14 @@ angular.module('audiodio.playlist', [])
       }
     };
 
+    session.getSongByXipath = function (xipath) {
+      var currentPosition = session.indexOfSongByXipath(xipath);
+      if (currentPosition > -1 && currentPosition < session.playlist.length - 1) {
+        return session.playlist[currentPosition + 1] || {};
+      } else if (currentPosition > -1) {
+        return {};
+      }
+    };
     session.getNextXipath = function (xipath) {
 
       var currentPosition = session.indexOfSongByXipath(xipath);
