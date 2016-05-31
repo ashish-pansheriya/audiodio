@@ -5,7 +5,9 @@ angular.module('search', []) //album.html
     $scope.addSong = function (song) {
       //xipath.setContext(song.xipath);
       session.add(song);
-      xipath.setContext(song.xipath);
+      if (getCurrentTime() === 0)
+        xipath.setContext(song.xipath);
+
       links.formUrl('savePlaylist').then(function (url) {
         session.resetPlaylistName();
         session.savePlaylist(url, user.getId()).then(function (success) {
@@ -15,7 +17,9 @@ angular.module('search', []) //album.html
     };
     $scope.addAllSongs = function () {
       if ($scope.songs.length > 0) {
-        xipath.setContext($scope.songs[0].xipath);
+        if (getCurrentTime === 0)
+          xipath.setContext($scope.songs[0].xipath);
+
         for (var s in $scope.songs) {
           session.add($scope.songs[s]);
         }
@@ -27,6 +31,15 @@ angular.module('search', []) //album.html
         });
       }
     };
+
+    function getCurrentTime () {
+      var $audio = document.getElementById(xipath.getContext());
+      if ($audio) {
+        return $audio.currentTime;
+      } else {
+        return 0;
+      }
+    }
   }])
   .controller('albumCtrl', ['links', '$scope', 'browseAlbum', '$stateParams', 'directory', 'session', 'user', '$controller', function (links, $scope, browseAlbum , $stateParams, directory, session, user, $controller) {
     //inherit songs controller

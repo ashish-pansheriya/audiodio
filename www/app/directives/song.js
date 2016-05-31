@@ -55,6 +55,7 @@ function SongCtrl (links, $scope , xipath, session, $timeout, metrics, user, art
   vm.play = play;
   vm.pause = pause;
   vm.togglePlayingState = togglePlayingState;
+  vm.bindAudioTagEvents = bindAudioTagEvents;
   vm.next = next;
   vm.isSongInContext = isSongInContext;
   vm.volume = 50.0;
@@ -132,31 +133,23 @@ function SongCtrl (links, $scope , xipath, session, $timeout, metrics, user, art
       return 0;
     }
   }
+  function bindAudioTagEvents () {
+    $timeout(function () {
+      var $audio = document.getElementById(xipath.getContext());
+      if ($audio) {
+        $audio.addEventListener('ended', vm.next);
+      }
+      $scope.$emit('song:load');
+    }, 1000); //give it a second to load into the DOM
 
-
-
-
+  }
   function load () {
     var $audio = document.getElementById(xipath.getContext());
     if ($audio) {
-
-
       $audio.load();
       $audio.play();
-      $audio.addEventListener('ended', vm.next);
+      //$audio.addEventListener('ended', vm.next);
     }
-
-    $scope.$emit('song:load');
-
-    links.formUrl('recordPlay').then(function (url) {
-      metrics.recordSongPlayedByXipath(url, vm.song.xipath, user.getId()).then(function (success) {
-        if (success) {
-          console.log('recording song being played'); //TESTING!!!
-        } else {
-          console.log('could not record song being played'); //TESTING!!!
-        }
-      })
-    });
   }
   function isSongPlaying () {
     var $audio = document.getElementById(xipath.getContext());
@@ -196,6 +189,12 @@ function SongCtrl (links, $scope , xipath, session, $timeout, metrics, user, art
       xipath.setContext(nxt);
       $scope.$apply();
       vm.load();
+    });
+
+    links.formUrl('recordPlay').then(function (url) {
+      metrics.recordSongPlayedByXipath(url, vm.song.xipath, user.getId()).then(function (success) {
+
+      });
     });
   }
 

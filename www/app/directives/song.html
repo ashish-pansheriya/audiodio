@@ -3,7 +3,7 @@
     <h2>{{vm.song | songNameFilter}}</h2>
     <p>{{vm.song | artistNameFilter}}</p>
     <p>{{vm.album.year}}</p>
-    <audio ng-if="vm.isSongInContext(vm.song.xipath)" id="{{vm.song.xipath}}" name="media" style="display: none;">
+    <audio ng-if="vm.isSongInContext(vm.song.xipath)" ng-init="vm.bindAudioTagEvents()" id="{{vm.song.xipath}}" name="media" style="display: none;">
         <source ng-if="vm.isSongLoaded" type="audio/mpeg" src="{{vm.song.uri | trusted}}">
     </audio>
 </div>
