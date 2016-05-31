@@ -1,10 +1,11 @@
-angular.module('search', [])
+angular.module('search', []) //album.html
 
-  .controller('songsCtrl', ['links', '$scope', 'browseAlbum', '$stateParams', 'directory', 'session', 'user', '$state', function (links, $scope, browseAlbum , $stateParams, directory, session, user, $state) {
+  .controller('songsCtrl', ['links', '$scope', 'browseAlbum', '$stateParams', 'directory', 'session', 'user', '$state', 'xipath', function (links, $scope, browseAlbum , $stateParams, directory, session, user, $state, xipath) {
     $scope.songs  = [];
     $scope.addSong = function (song) {
       //xipath.setContext(song.xipath);
       session.add(song);
+      xipath.setContext(song.xipath);
       links.formUrl('savePlaylist').then(function (url) {
         session.resetPlaylistName();
         session.savePlaylist(url, user.getId()).then(function (success) {
@@ -14,6 +15,7 @@ angular.module('search', [])
     };
     $scope.addAllSongs = function () {
       if ($scope.songs.length > 0) {
+        xipath.setContext($scope.songs[0].xipath);
         for (var s in $scope.songs) {
           session.add($scope.songs[s]);
         }

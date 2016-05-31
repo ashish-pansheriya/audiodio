@@ -1,7 +1,7 @@
 angular.module('frame', [])
   .controller('frameCtrl', FrameCtrl);
-  FrameCtrl.$inject = ['$rootScope', '$scope', '$ionicModal', 'session', 'xipath', 'links', 'user', '$ionicHistory', '$location', '$state', 'radioService'];
-  function FrameCtrl ($rootScope, $scope, $ionicModal, session, xipath, links, user, $ionicHistory, $location, $state, radioService) {
+  FrameCtrl.$inject = ['$rootScope', '$scope', '$ionicModal', 'session', 'xipath', 'links', 'user', '$ionicHistory', '$location', '$state', 'radioService', '$filter'];
+  function FrameCtrl ($rootScope, $scope, $ionicModal, session, xipath, links, user, $ionicHistory, $location, $state, radioService, $filter) {
     var vm = this;
     vm.playlist = {
       songs: [],
@@ -32,9 +32,18 @@ angular.module('frame', [])
         return false;
       }
     }
-    function play () {
+    function load () {
       var $audio = document.getElementById(xipath.getContext());
       if ($audio) {
+        $audio.load();
+        $audio.play();
+      }
+    }
+    function play () {
+      var $audio = document.getElementById(xipath.getContext());
+      if ($audio && $audio.currentTime === 0) {
+        load();
+      } else if ($audio) {
         $audio.play();
       }
     }
@@ -54,7 +63,8 @@ angular.module('frame', [])
     function getCurrentSongName () {
       var xi = xipath.getContext();
       if (xi.length > 0) {
-        return session.getSongByXipath(xi);
+        var name = session.getSongByXipath(xi).name;
+        return name.substring(3,name.length - 4);
       } else {
         return '';
       }

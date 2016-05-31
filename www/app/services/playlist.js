@@ -36,14 +36,9 @@ angular.module('audiodio.playlist', [])
         session.playlist.splice(killMe, 1);
       }
     };
-
     session.getSongByXipath = function (xipath) {
       var currentPosition = session.indexOfSongByXipath(xipath);
-      if (currentPosition > -1 && currentPosition < session.playlist.length - 1) {
-        return session.playlist[currentPosition + 1] || {};
-      } else if (currentPosition > -1) {
-        return {};
-      }
+      return session.playlist[currentPosition] || {};
     };
     session.getNextXipath = function (xipath) {
 

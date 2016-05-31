@@ -4,9 +4,11 @@
         <ion-nav-buttons side="left">
           <button class="button button-icon button-clear ion-navicon" menu-toggle="left"></button>
         </ion-nav-buttons>
+
         <ion-nav-buttons side="right">
-            <button ng-if="!vm.isPlaying()" style="margin-left: 100px;" class="button button-icon ion-play" ng-click="vm.togglePlayingState()"></button>
-            <button ng-if="vm.isPlaying()" style="margin-left: 100px;" class="button button-icon ion-pause" ng-click="vm.togglePlayingState()"></button>
+            <span style="line-height: 2.5;">{{vm.getCurrentSongName()}}</span>
+            <button ng-if="!vm.isPlaying()" style="margin-left: 10px;" class="button button-icon ion-play" ng-click="vm.togglePlayingState()"></button>
+            <button ng-if="vm.isPlaying()" style="margin-left: 10px;" class="button button-icon ion-pause" ng-click="vm.togglePlayingState()"></button>
         </ion-nav-buttons>
     </ion-nav-bar>
 
