@@ -17,7 +17,7 @@ angular.module('search', []) //album.html
     };
     $scope.addAllSongs = function () {
       if ($scope.songs.length > 0) {
-        if (getCurrentTime === 0)
+        if (getCurrentTime() === 0)
           xipath.setContext($scope.songs[0].xipath);
 
         for (var s in $scope.songs) {
