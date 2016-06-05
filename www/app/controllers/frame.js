@@ -1,7 +1,7 @@
 angular.module('frame', [])
   .controller('frameCtrl', FrameCtrl);
-  FrameCtrl.$inject = ['$rootScope', '$scope', '$ionicModal', 'session', 'xipath', 'links', 'user', '$ionicHistory', '$location', '$state', 'radioService', '$filter'];
-  function FrameCtrl ($rootScope, $scope, $ionicModal, session, xipath, links, user, $ionicHistory, $location, $state, radioService, $filter) {
+  FrameCtrl.$inject = ['$rootScope', '$scope', '$ionicModal', 'session', 'xipath', 'links', 'user', '$ionicHistory', '$location', '$state', 'radioService', '$filter', '$ionicTabsDelegate'];
+  function FrameCtrl ($rootScope, $scope, $ionicModal, session, xipath, links, user, $ionicHistory, $location, $state, radioService, $filter, $ionicTabsDelegate) {
     var vm = this;
     vm.playlist = {
       songs: [],
@@ -24,7 +24,7 @@ angular.module('frame', [])
     vm.browseStates = ['app.artists', 'app.albums', 'app.album']; //TODO: make these child states of app.browse
     $rootScope.$on('$stateChangeSuccess', function (ev, to, toParams, from, fromParams) {
       //assign the "from" parameter to something
-      console.log('recorded state change'); //TESTING!!!
+      //console.log('recorded state change'); //TESTING!!!
       vm.stateHistory.push(from.name);
     });
 
@@ -32,11 +32,12 @@ angular.module('frame', [])
         listenToRadio();
     });
 
-    function gotoBrowse () {
+    function gotoBrowse (index) {
       for (var b = vm.stateHistory.length - 1; b >= 0; b--) { //check state histories in reverse starting with most recent
         // TODO: once child states are defined in ui router, then look for anything matching app.browse
         if (vm.browseStates.indexOf(vm.stateHistory[b]) > -1) { //goto most recent browse state
           $state.go(vm.stateHistory[b]);
+          $ionicTabsDelegate.select(index);
           return;
         }
       }
