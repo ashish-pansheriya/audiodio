@@ -3,12 +3,15 @@ angular.module('audiodio.xipath', [])
   function ($http, $q) {
     var service  = {
       context: '',
+      clearContext: clearContext,
       setContext : setContext,
       getContext: getContext,
       fetchSongByXipath: getSongMetaData,
       cache: {}
     };
-
+    function clearContext () {
+      service.context = '';
+    }
     function setContext (xi) {
       service.context = xi;
     }

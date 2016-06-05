@@ -2,10 +2,6 @@ angular.module('audiodio.metrics', [])
   .factory('metrics', ['$http', '$q',
     function ($http, $q) {
       var metrics = {};
-      /*      var dummy = {
-       xipath: 'asdfa',
-       userId: 'will'
-       };*/
 
       metrics.recordSongPlayedByXipath = function (link, xipath, userId) {
         var cb = $q.defer();

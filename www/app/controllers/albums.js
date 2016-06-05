@@ -19,7 +19,6 @@ function AlbumsCtrl (links, browseAlbum , directory, albumCovers) {
 
               vm.albums.push(album);
 
-
               if (a + 1 < albums.length) {
                 a++;
                 iterate();

@@ -20,6 +20,7 @@ angular.module('frame', [])
     vm.isPlaying = isSongPlaying;
     vm.togglePlayingState = togglePlayingState;
 
+
     $scope.$on('song:load', function (e) {
         listenToRadio();
     });
@@ -91,6 +92,7 @@ angular.module('frame', [])
 
     function clearPlaylist () {
       session.clearSongs();
+      xipath.clearContext();
     }
 
 
