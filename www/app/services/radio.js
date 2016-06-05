@@ -1,7 +1,7 @@
 
 angular.module('audiodio.services.radio', [])
 
-.service('radioService', radio);
+  .service('radioService', radio);
 radio.$inject = ['$http', '$q'];
 
 function radio ($http, $q) {

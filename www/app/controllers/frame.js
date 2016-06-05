@@ -19,12 +19,28 @@ angular.module('frame', [])
     vm.shufflePlaylist = shufflePlaylist;
     vm.isPlaying = isSongPlaying;
     vm.togglePlayingState = togglePlayingState;
-
+    vm.gotoBrowse = gotoBrowse;
+    vm.stateHistory = ['app.artists']; //start off with default state for app.browse
+    vm.browseStates = ['app.artists', 'app.albums', 'app.album']; //TODO: make these child states of app.browse
+    $rootScope.$on('$stateChangeSuccess', function (ev, to, toParams, from, fromParams) {
+      //assign the "from" parameter to something
+      console.log('recorded state change'); //TESTING!!!
+      vm.stateHistory.push(from.name);
+    });
 
     $scope.$on('song:load', function (e) {
         listenToRadio();
     });
 
+    function gotoBrowse () {
+      for (var b = vm.stateHistory.length - 1; b >= 0; b--) { //check state histories in reverse starting with most recent
+        // TODO: once child states are defined in ui router, then look for anything matching app.browse
+        if (vm.browseStates.indexOf(vm.stateHistory[b]) > -1) { //goto most recent browse state
+          $state.go(vm.stateHistory[b]);
+          return;
+        }
+      }
+    }
     function isSongPlaying () {
       var $audio = document.getElementById(xipath.getContext());
       if ($audio) {
